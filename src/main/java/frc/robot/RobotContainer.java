@@ -6,12 +6,9 @@ package frc.robot;
 
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.Joystick;
-import edu.wpi.first.wpilibj.XboxController;
-import frc.robot.commands.StartDriveCommand;
-import frc.robot.commands.StopDriveCommand;
+import frc.robot.commands.DefaultDriveCommand;
 import frc.robot.subsystems.DriveSubsystem;
-import edu.wpi.first.wpilibj2.command.button.JoystickButton;
-
+import frc.robot.Constants.ControllerConstants.*; 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
  * "declarative" paradigm, very little robot logic should actually be handled in the {@link Robot}
@@ -20,7 +17,7 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
  */
 public class RobotContainer {
   private final Joystick m_joystick = new Joystick(0);
-
+  private final DriveSubsystem m_driveSubsystem = new DriveSubsystem();
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
     // Configure the button bindings
@@ -34,12 +31,6 @@ public class RobotContainer {
    * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
   private void configureButtonBindings() {
-    new JoystickButton(m_joystick, 2).whenPressed(new StartDriveCommand());
-    new JoystickButton(m_joystick, 1).whenPressed(new StopDriveCommand());
-    DriveSubsystem.get().setJoystick(m_joystick);
+    m_driveSubsystem.setDefaultCommand(new DefaultDriveCommand(() -> m_joystick.getRawAxis(Axis.kLeftX), ()->m_joystick.getRawAxis(Axis.kLeftY),()->m_joystick.getRawAxis(Axis.kRightX)));
   }
-
-public Joystick getJoystick() {
-    return m_joystick;
-}
 }
