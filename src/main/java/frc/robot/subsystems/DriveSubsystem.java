@@ -4,99 +4,190 @@
 
 package frc.robot.subsystems;
 
-import edu.wpi.first.math.estimator.DifferentialDrivePoseEstimator;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.kinematics.DifferentialDriveOdometry;
-import edu.wpi.first.wpilibj.Encoder;
-import edu.wpi.first.wpilibj.drive.DifferentialDrive;
-import edu.wpi.first.wpilibj.motorcontrol.Spark;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import com.revrobotics.CANSparkMax;
+import com.revrobotics.RelativeEncoder;
+import com.revrobotics.SparkMaxPIDController;
+import com.revrobotics.CANSparkMax.ControlType;
+import com.revrobotics.CANSparkMax.IdleMode;
+import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.sensors.RomiGyro;
+import frc.robot.Constants.DriveConstants;
 
 public class DriveSubsystem extends SubsystemBase {
-  private static final double kCountsPerRevolution = 1440.0;
-  private static final double kWheelDiameterMeter = .35;// 70 mm is the actual diameter, scale down by 5
 
-  // The Romi has the left and right motors set to
-  // PWM channels 0 and 1 respectively
-  private final Spark m_leftMotor = new Spark(0);
-  private final Spark m_rightMotor = new Spark(1);
+  private CANSparkMax m_frontRightDriveMotor = new CANSparkMax(DriveConstants.kFrontRightDrivePort, MotorType.kBrushless);
+  private CANSparkMax m_frontRightSteerMotor = new CANSparkMax(DriveConstants.kFrontRightSteerPort, MotorType.kBrushless);  
 
-  // The Romi has onboard encoders that are hardcoded
-  // to use DIO pins 4/5 and 6/7 for the left and right
-  private final Encoder m_leftEncoder = new Encoder(4, 5);
-  private final Encoder m_rightEncoder = new Encoder(6, 7);
+  private CANSparkMax m_frontLeftDriveMotor = new CANSparkMax(DriveConstants.kFrontLeftDrivePort, MotorType.kBrushless);
+  private CANSparkMax m_frontLeftSteerMotor = new CANSparkMax(DriveConstants.kFrontLeftSteerPort, MotorType.kBrushless);  
   
-  private final DifferentialDriveOdometry m_odometry = new DifferentialDriveOdometry(new Rotation2d(0), new Pose2d(new Translation2d(0, 0), new Rotation2d(0)));
-  
-  // Set up the differential drive controller
-  private final DifferentialDrive m_diffDrive = new DifferentialDrive(m_leftMotor, m_rightMotor);
-  private final RomiGyro m_romiGyro = new RomiGyro();
+  private CANSparkMax m_backRightDriveMotor = new CANSparkMax(DriveConstants.kBackRightDrivePort, MotorType.kBrushless);
+  private CANSparkMax m_backRightSteerMotor = new CANSparkMax(DriveConstants.kBackRightDrivePort, MotorType.kBrushless);
 
-  public static DriveSubsystem s_subsystem;
-  /** Creates a new RomiDrivetrain. */
+  private CANSparkMax m_backLeftDriveMotor = new CANSparkMax(DriveConstants.kBackLeftDrivePort, MotorType.kBrushless);
+  private CANSparkMax m_backLeftSteerMotor = new CANSparkMax(DriveConstants.kBackLeftSteerPort, MotorType.kBrushless);
+
+  private SparkMaxPIDController m_frontRightSteerPIDController = m_frontRightSteerMotor.getPIDController();
+  private SparkMaxPIDController m_frontLeftSteerPIDController = m_frontLeftSteerMotor.getPIDController();
+  private SparkMaxPIDController m_backRightSteerPIDController = m_backRightSteerMotor.getPIDController();
+  private SparkMaxPIDController m_backLeftSteerPIDController = m_backLeftSteerMotor.getPIDController();
+
+  private RelativeEncoder m_frontRightSteerEncoder = m_frontRightSteerMotor.getEncoder();
+  private RelativeEncoder m_frontLeftSteerEncoder = m_frontLeftSteerMotor.getEncoder();
+  private RelativeEncoder m_backRightSteerEncoder = m_backRightSteerMotor.getEncoder();
+  private RelativeEncoder m_backLeftSteerEncoder = m_backLeftSteerMotor.getEncoder();
+
+  
+  private static DriveSubsystem s_subsystem;
+
+  /** Creates a new DriveSubsystem. */
   public DriveSubsystem() {
+    //Singleton
+    if(s_subsystem != null){
+      try {
+        throw new Exception("Motor subsystem already initalized!");
+      } catch (Exception e) {
+        e.printStackTrace();
+      }
+    }
     s_subsystem = this;
-    // Use meters as unit for encoder distances
-    m_leftEncoder.setDistancePerPulse((Math.PI * kWheelDiameterMeter) / kCountsPerRevolution);
-    m_rightEncoder.setDistancePerPulse((Math.PI * kWheelDiameterMeter) / kCountsPerRevolution);
-    resetEncoders();
 
-    // Invert right side since motor is flipped
-    m_rightMotor.setInverted(true);
+    //Inatilize motors
+    m_frontRightDriveMotor.restoreFactoryDefaults();
+    m_frontRightDriveMotor.setIdleMode(IdleMode.kBrake);
+    m_frontRightDriveMotor.enableVoltageCompensation(12);
+    m_frontRightDriveMotor.setSmartCurrentLimit(10);
+
+    m_frontRightSteerMotor.restoreFactoryDefaults();
+    m_frontRightSteerMotor.setIdleMode(IdleMode.kBrake);
+    m_frontRightSteerMotor.enableVoltageCompensation(12);
+    m_frontRightSteerMotor.setSmartCurrentLimit(10);
+    
+    m_frontRightSteerPIDController.setP(DriveConstants.kP);
+    m_frontRightSteerPIDController.setI(DriveConstants.kI);
+    m_frontRightSteerPIDController.setIZone(DriveConstants.kIz);
+    m_frontRightSteerPIDController.setD(DriveConstants.kD);
+    m_frontRightSteerPIDController.setFF(DriveConstants.kFF);
+    m_frontRightSteerPIDController.setOutputRange(DriveConstants.kMinOutput, DriveConstants.kMaxOutput);
+
+    m_frontRightSteerPIDController.setSmartMotionAccelStrategy(DriveConstants.kTrapezoidal, DriveConstants.kSlotID);
+    m_frontRightSteerPIDController.setSmartMotionMaxAccel(DriveConstants.kMaxAcel, DriveConstants.kSlotID);
+    m_frontRightSteerPIDController.setSmartMotionMaxVelocity(DriveConstants.kMaxVelocity, DriveConstants.kSlotID);
+    m_frontRightSteerPIDController.setSmartMotionAllowedClosedLoopError(DriveConstants.kAllowedError, DriveConstants.kSlotID);
+    m_frontRightSteerPIDController.setSmartMotionMinOutputVelocity(DriveConstants.kMinVelocity, DriveConstants.kSlotID);
+
+    m_frontLeftDriveMotor.restoreFactoryDefaults();
+    m_frontLeftDriveMotor.setIdleMode(IdleMode.kBrake);
+    m_frontLeftDriveMotor.enableVoltageCompensation(12);
+    m_frontLeftDriveMotor.setSmartCurrentLimit(10);
+
+    m_frontLeftSteerMotor.restoreFactoryDefaults();
+    m_frontLeftSteerMotor.setIdleMode(IdleMode.kBrake);
+    m_frontLeftSteerMotor.enableVoltageCompensation(12);
+    m_frontLeftSteerMotor.setSmartCurrentLimit(10);
+    
+    m_frontLeftSteerPIDController.setP(DriveConstants.kP);
+    m_frontLeftSteerPIDController.setI(DriveConstants.kI);
+    m_frontLeftSteerPIDController.setIZone(DriveConstants.kIz);
+    m_frontLeftSteerPIDController.setD(DriveConstants.kD);
+    m_frontLeftSteerPIDController.setFF(DriveConstants.kFF);
+    m_frontLeftSteerPIDController.setOutputRange(DriveConstants.kMinOutput, DriveConstants.kMaxOutput);
+
+    m_frontLeftSteerPIDController.setSmartMotionAccelStrategy(DriveConstants.kTrapezoidal, DriveConstants.kSlotID);
+    m_frontLeftSteerPIDController.setSmartMotionMaxAccel(DriveConstants.kMaxAcel, DriveConstants.kSlotID);
+    m_frontLeftSteerPIDController.setSmartMotionMaxVelocity(DriveConstants.kMaxVelocity, DriveConstants.kSlotID);
+    m_frontLeftSteerPIDController.setSmartMotionAllowedClosedLoopError(DriveConstants.kAllowedError, DriveConstants.kSlotID);
+    m_frontLeftSteerPIDController.setSmartMotionMinOutputVelocity(DriveConstants.kMinVelocity, DriveConstants.kSlotID);
+
+    m_backRightDriveMotor = new CANSparkMax(0, MotorType.kBrushless);
+    m_backRightDriveMotor.restoreFactoryDefaults();
+    m_backRightDriveMotor.setIdleMode(IdleMode.kBrake);
+    m_backRightDriveMotor.enableVoltageCompensation(12);
+    m_backRightDriveMotor.setSmartCurrentLimit(10);
+
+    m_backRightSteerMotor = new CANSparkMax(0, MotorType.kBrushless);
+    m_backRightSteerMotor.restoreFactoryDefaults();
+    m_backRightSteerMotor.setIdleMode(IdleMode.kBrake);
+    m_backRightSteerMotor.enableVoltageCompensation(12);
+    m_backRightSteerMotor.setSmartCurrentLimit(10);
+    
+    m_backRightSteerPIDController.setP(DriveConstants.kP);
+    m_backRightSteerPIDController.setI(DriveConstants.kI);
+    m_backRightSteerPIDController.setIZone(DriveConstants.kIz);
+    m_backRightSteerPIDController.setD(DriveConstants.kD);
+    m_backRightSteerPIDController.setFF(DriveConstants.kFF);
+    m_backRightSteerPIDController.setOutputRange(DriveConstants.kMinOutput, DriveConstants.kMaxOutput);
+
+    m_backRightSteerPIDController.setSmartMotionAccelStrategy(DriveConstants.kTrapezoidal, DriveConstants.kSlotID);
+    m_backRightSteerPIDController.setSmartMotionMaxAccel(DriveConstants.kMaxAcel, DriveConstants.kSlotID);
+    m_backRightSteerPIDController.setSmartMotionMaxVelocity(DriveConstants.kMaxVelocity, DriveConstants.kSlotID);
+    m_backRightSteerPIDController.setSmartMotionAllowedClosedLoopError(DriveConstants.kAllowedError, DriveConstants.kSlotID);
+    m_backRightSteerPIDController.setSmartMotionMinOutputVelocity(DriveConstants.kMinVelocity, DriveConstants.kSlotID);
+
+    m_backLeftDriveMotor = new CANSparkMax(0, MotorType.kBrushless);
+    m_backLeftDriveMotor.restoreFactoryDefaults();
+    m_backLeftDriveMotor.setIdleMode(IdleMode.kBrake);
+    m_backLeftDriveMotor.enableVoltageCompensation(12);
+    m_backLeftDriveMotor.setSmartCurrentLimit(10);
+
+    m_backLeftSteerMotor = new CANSparkMax(0, MotorType.kBrushless);
+    m_backLeftSteerMotor.restoreFactoryDefaults();
+    m_backLeftSteerMotor.setIdleMode(IdleMode.kBrake);
+    m_backLeftSteerMotor.enableVoltageCompensation(12);
+    m_backLeftSteerMotor.setSmartCurrentLimit(10);
+    
+    m_backLeftSteerPIDController.setP(DriveConstants.kP);
+    m_backLeftSteerPIDController.setI(DriveConstants.kI);
+    m_backLeftSteerPIDController.setIZone(DriveConstants.kIz);
+    m_backLeftSteerPIDController.setD(DriveConstants.kD);
+    m_backLeftSteerPIDController.setFF(DriveConstants.kFF);
+    m_backLeftSteerPIDController.setOutputRange(DriveConstants.kMinOutput, DriveConstants.kMaxOutput);
+
+    m_backLeftSteerPIDController.setSmartMotionAccelStrategy(DriveConstants.kTrapezoidal, DriveConstants.kSlotID);
+    m_backLeftSteerPIDController.setSmartMotionMaxAccel(DriveConstants.kMaxAcel, DriveConstants.kSlotID);
+    m_backLeftSteerPIDController.setSmartMotionMaxVelocity(DriveConstants.kMaxVelocity, DriveConstants.kSlotID);
+    m_backLeftSteerPIDController.setSmartMotionAllowedClosedLoopError(DriveConstants.kAllowedError, DriveConstants.kSlotID);
+    m_backLeftSteerPIDController.setSmartMotionMinOutputVelocity(DriveConstants.kMinVelocity, DriveConstants.kSlotID);
   }
 
   public static DriveSubsystem get(){
     return s_subsystem;
   }
-  public void arcadeDrive(double xaxisSpeed, double zaxisRotate) {
-    m_diffDrive.arcadeDrive(xaxisSpeed, zaxisRotate);
-  }
-
-  public void tankDrive(double leftSpeed, double rightSpeed){
-    m_diffDrive.tankDrive(leftSpeed, rightSpeed);
-  }
-
-  public void resetEncoders() {
-    m_leftEncoder.reset();
-    m_rightEncoder.reset();
-  }
-
-  public double getLeftDistance() {
-    return m_leftEncoder.getDistance();
-  }
-
-  public double getRightDistance() {
-    return m_rightEncoder.getDistance();
-  }
-
 
   public double getHeading(){
-    return (m_romiGyro.getAngle())*Math.PI/180;
+    return 0;
   }
 
-  public Pose2d getPose(){
-    //System.out.println(getHeading());
-
-    SmartDashboard.putString("pose", m_odometry.getPoseMeters().toString());
-    return m_odometry.getPoseMeters();
+  public void setDriveMotors(double frontLeftSpeed, double frontRightSpeed, double backLeftSpeed, double backRightSpeed){
+    m_frontLeftDriveMotor.set(frontLeftSpeed);
+    m_frontRightDriveMotor.set(frontRightSpeed);
+    m_backLeftDriveMotor.set(backLeftSpeed);
+    m_backRightDriveMotor.set(backRightSpeed);
+  }
+  public double getFrontLeftSteerEncoderPosition(){
+    return m_frontLeftSteerEncoder.getPosition();
+  }
+  public double getFrontRightSteerEncoderPosition(){
+    return m_frontRightSteerEncoder.getPosition();
+  }
+  public double getBackLeftSteerEncoderPosition(){
+    return m_backLeftSteerEncoder.getPosition();
+  }
+  public double getBackRightSteerEncoderPosition(){
+    return m_backRightSteerEncoder.getPosition();
+  }
+  private double getTargetEncoderPosition(double currentEncoderPosition, double targetAngle){
+    return currentEncoderPosition - (42/(2*Math.PI))*((currentEncoderPosition%42)*((2*Math.PI)/42) - targetAngle);
+  }
+  public void setSteerMotors(double frontLeftAngle, double frontRightAngle, double backLeftAngle, double backRightAngle){
+    m_frontLeftSteerPIDController.setReference(getTargetEncoderPosition(getFrontLeftSteerEncoderPosition(), frontLeftAngle), ControlType.kPosition);
+    m_frontRightSteerPIDController.setReference(getTargetEncoderPosition(getFrontRightSteerEncoderPosition(), frontRightAngle), ControlType.kPosition);
+    m_backLeftSteerPIDController.setReference(getTargetEncoderPosition(getBackLeftSteerEncoderPosition(), backLeftAngle), ControlType.kPosition);
+    m_backRightSteerPIDController.setReference(getTargetEncoderPosition(getBackRightSteerEncoderPosition(), backRightAngle), ControlType.kPosition);
   }
   @Override
   public void periodic() {
-    // This method will be called once per scheduler run
-    //System.out.println(getHeading());
-    //System.out.println(getLeftDistance());
-    //System.out.println(getRightDistance());
-    m_odometry.update(new Rotation2d(getHeading()), getLeftDistance(), getRightDistance());
-    //System.out.println(m_odometry.getPoseMeters().toString());
+    
 
-  }
-
-  @Override
-  public void simulationPeriodic() {
-    // This method will be called once per scheduler run during simulation
   }
 }

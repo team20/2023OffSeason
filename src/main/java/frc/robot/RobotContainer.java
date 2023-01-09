@@ -4,18 +4,11 @@
 
 package frc.robot;
 
-import java.util.List;
-
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.trajectory.TrajectoryConfig;
-import edu.wpi.first.math.trajectory.TrajectoryGenerator;
-import edu.wpi.first.wpilibj.XboxController;
-import frc.robot.commands.DriveTime;
-import frc.robot.commands.PurePursuitCommand;
+import edu.wpi.first.wpilibj.GenericHID;
+import edu.wpi.first.wpilibj.Joystick;
+import frc.robot.commands.DefaultDriveCommand;
 import frc.robot.subsystems.DriveSubsystem;
-import edu.wpi.first.wpilibj2.command.Command;
-
+import frc.robot.Constants.ControllerConstants.*; 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
  * "declarative" paradigm, very little robot logic should actually be handled in the {@link Robot}
@@ -23,10 +16,8 @@ import edu.wpi.first.wpilibj2.command.Command;
  * subsystems, commands, and button mappings) should be declared here.
  */
 public class RobotContainer {
-  // The robot's subsystems and commands are defined here...
+  private final Joystick m_joystick = new Joystick(Constants.ControllerConstants.kDriverControllerPort);
   private final DriveSubsystem m_driveSubsystem = new DriveSubsystem();
-
-
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
     // Configure the button bindings
@@ -35,29 +26,11 @@ public class RobotContainer {
 
   /**
    * Use this method to define your button->command mappings. Buttons can be created by
-   * instantiating a {@link edu.wpi.first.wpilibj.GenericHID} or one of its subclasses ({@link
+   * instantiating a {@link GenericHID} or one of its subclasses ({@link
    * edu.wpi.first.wpilibj.Joystick} or {@link XboxController}), and then passing it to a {@link
    * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
-  private void configureButtonBindings() {}
-
-  /**
-   * Use this to pass the autonomous command to the main {@link Robot} class.
-   *
-   * @return the command to run in autonomous
-   */
-  public Command getAutonomousCommand() {
-    // An ExampleCommand will run in autonomous
-    return new PurePursuitCommand(0.5, TrajectoryGenerator.generateTrajectory(
-      List.of(
-          new Pose2d(0, 0, new Rotation2d(0)),
-          new Pose2d(3, 1, new Rotation2d(Math.PI/4)),
-          new Pose2d(6, 0, new Rotation2d(-Math.PI/2)),
-          new Pose2d(3, -1, new Rotation2d(-Math.PI/4)),
-          new Pose2d(0, -.2, new Rotation2d(Math.PI/2))
-          ),
-      new TrajectoryConfig(1, 1)
-        ));
-        //return new DriveTime();
+  private void configureButtonBindings() {
+    m_driveSubsystem.setDefaultCommand(new DefaultDriveCommand(m_driveSubsystem, () -> m_joystick.getRawAxis(Axis.kLeftX), ()->m_joystick.getRawAxis(Axis.kLeftY),()->m_joystick.getRawAxis(Axis.kRightX)));
   }
 }
