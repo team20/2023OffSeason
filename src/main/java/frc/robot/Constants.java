@@ -69,7 +69,7 @@ public final class Constants {
         public static final double kFF = 0;
         public static final double kMinOutput = -1.0;
         public static final double kMaxOutput = 1.0;
-        public static final AccelStrategy kTrapezoidal = null;
+        public static final AccelStrategy kTrapezoidal = AccelStrategy.kTrapezoidal;
         public static final int kSlotID = 0;
         public static final double kMaxAcel = 0;
         public static final double kMaxVelocity = 0;

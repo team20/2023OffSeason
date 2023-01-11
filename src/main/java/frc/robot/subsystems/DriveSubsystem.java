@@ -22,7 +22,7 @@ public class DriveSubsystem extends SubsystemBase {
   private CANSparkMax m_frontLeftSteerMotor = new CANSparkMax(DriveConstants.kFrontLeftSteerPort, MotorType.kBrushless);  
   
   private CANSparkMax m_backRightDriveMotor = new CANSparkMax(DriveConstants.kBackRightDrivePort, MotorType.kBrushless);
-  private CANSparkMax m_backRightSteerMotor = new CANSparkMax(DriveConstants.kBackRightDrivePort, MotorType.kBrushless);
+  private CANSparkMax m_backRightSteerMotor = new CANSparkMax(DriveConstants.kBackRightSteerPort, MotorType.kBrushless);
 
   private CANSparkMax m_backLeftDriveMotor = new CANSparkMax(DriveConstants.kBackLeftDrivePort, MotorType.kBrushless);
   private CANSparkMax m_backLeftSteerMotor = new CANSparkMax(DriveConstants.kBackLeftSteerPort, MotorType.kBrushless);
@@ -52,7 +52,7 @@ public class DriveSubsystem extends SubsystemBase {
     }
     s_subsystem = this;
 
-    //Inatilize motors
+    //Initialize motors
     m_frontRightDriveMotor.restoreFactoryDefaults();
     m_frontRightDriveMotor.setIdleMode(IdleMode.kBrake);
     m_frontRightDriveMotor.enableVoltageCompensation(12);
@@ -99,13 +99,11 @@ public class DriveSubsystem extends SubsystemBase {
     m_frontLeftSteerPIDController.setSmartMotionAllowedClosedLoopError(DriveConstants.kAllowedError, DriveConstants.kSlotID);
     m_frontLeftSteerPIDController.setSmartMotionMinOutputVelocity(DriveConstants.kMinVelocity, DriveConstants.kSlotID);
 
-    m_backRightDriveMotor = new CANSparkMax(0, MotorType.kBrushless);
     m_backRightDriveMotor.restoreFactoryDefaults();
     m_backRightDriveMotor.setIdleMode(IdleMode.kBrake);
     m_backRightDriveMotor.enableVoltageCompensation(12);
     m_backRightDriveMotor.setSmartCurrentLimit(10);
 
-    m_backRightSteerMotor = new CANSparkMax(0, MotorType.kBrushless);
     m_backRightSteerMotor.restoreFactoryDefaults();
     m_backRightSteerMotor.setIdleMode(IdleMode.kBrake);
     m_backRightSteerMotor.enableVoltageCompensation(12);
@@ -124,13 +122,11 @@ public class DriveSubsystem extends SubsystemBase {
     m_backRightSteerPIDController.setSmartMotionAllowedClosedLoopError(DriveConstants.kAllowedError, DriveConstants.kSlotID);
     m_backRightSteerPIDController.setSmartMotionMinOutputVelocity(DriveConstants.kMinVelocity, DriveConstants.kSlotID);
 
-    m_backLeftDriveMotor = new CANSparkMax(0, MotorType.kBrushless);
     m_backLeftDriveMotor.restoreFactoryDefaults();
     m_backLeftDriveMotor.setIdleMode(IdleMode.kBrake);
     m_backLeftDriveMotor.enableVoltageCompensation(12);
     m_backLeftDriveMotor.setSmartCurrentLimit(10);
 
-    m_backLeftSteerMotor = new CANSparkMax(0, MotorType.kBrushless);
     m_backLeftSteerMotor.restoreFactoryDefaults();
     m_backLeftSteerMotor.setIdleMode(IdleMode.kBrake);
     m_backLeftSteerMotor.enableVoltageCompensation(12);

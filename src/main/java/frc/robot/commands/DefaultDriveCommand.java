@@ -60,7 +60,7 @@ public class DefaultDriveCommand extends CommandBase {
     double frontRightAngle = Math.atan2(b, c);
     double frontLeftAngle = Math.atan2(b, d);
     double backRightAngle = Math.atan2(a, d);
-    double backLeftAngle = Math.atan2(a, c*c);
+    double backLeftAngle = Math.atan2(a, c);
     
     m_driveSubsystem.setSteerMotors(frontLeftAngle, frontRightAngle, backLeftAngle, backRightAngle);
     m_driveSubsystem.setDriveMotors(frontLeftSpeed, frontRightSpeed, backLeftSpeed, backRightSpeed);
