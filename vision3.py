@@ -53,8 +53,8 @@ def calibrate_camera():
       # Draw and display the corners
       image = cv.drawChessboardCorners(image, CHECKERBOARD, corners2, ret)
 
-    cv.imshow('img', image)
-    cv.waitKey(0)
+    #cv.imshow('img', image)
+    #cv.waitKey(0)
     
   cv.destroyAllWindows()    
     
@@ -63,8 +63,8 @@ def calibrate_camera():
   return cv.calibrateCamera(threedpoints, twodpoints, grayColor.shape[::-1], None, None)
 
 def main(): 
-  w = 600
-  h = 600
+  w = 1280
+  h = 720
 
   cap = cv.VideoCapture(2)
   ret, camera_mtx, distortion_mtx, r_vecs, t_vecs = calibrate_camera()
@@ -95,15 +95,18 @@ def main():
     # x, y, w, h = roi
     # undistorted_frame = undistorted_frame[y:y+h, x:x+w]
 
-    undistorted_frame = cv.remap(frame, mapx, mapy, cv.INTER_LINEAR)
+    #undistorted_frame = cv.remap(frame, mapx, mapy, cv.INTER_LINEAR)
 
-    gray_frame = cv.cvtColor(undistorted_frame, cv.COLOR_BGR2GRAY)
+    gray_frame = cv.cvtColor(frame, cv.COLOR_BGR2GRAY)
 
     debug_image = copy.deepcopy(frame)
     tags = detector.detect(gray_frame, estimate_tag_pose=True, camera_params=camera_params_detect, tag_size=k_tag_size)
     
     #drawing to the frame
     debug_image = draw_tags(debug_image, tags, elapsed_time)
+    # Cross Hair
+    cv.line(debug_image, (0,0), (debug_image.shape[1], debug_image.shape[0]), (0, 0, 0), 2)
+    cv.line(debug_image, (debug_image.shape[1], 0), (0, debug_image.shape[0]), (0, 0, 0), 2)
 
     elapsed_time = time.time() - start_time
 
@@ -115,7 +118,7 @@ def main():
     #show screen
     cv.imshow('AprilTag Detect', debug_image)
 
-    time.sleep(1)
+    #time.sleep(0.5)
 
   cap.release()
   cv.destroyAllWindows()
@@ -156,6 +159,10 @@ def draw_tags(image, tags, elapsed_time):
     cv.putText(image, str(tag_id), (center[0] - 10, center[1] - 10),
                 cv.FONT_HERSHEY_SIMPLEX, 0.75, (0, 0, 255), 2, cv.LINE_AA)
 
+    # Offset distances to correct 
+    tag.pose_t[2][0] /= 1.6 #offset z axis / distance
+    print(tag.pose_t)
+
     # Create the transformation matrix T
     T = np.concatenate((tag.pose_R, tag.pose_t.reshape(3, 1)), axis=1)
     T = np.concatenate((T, np.array([[0, 0, 0, 1]])), axis=0)
@@ -168,7 +175,7 @@ def draw_tags(image, tags, elapsed_time):
     translation = T_inv[:3, 3]
 
     # The pose of the AprilTag relative to the camera is given by the rotation matrix and the translation vector
-    print(f'Tag id: {tag.tag_id},   Rotation matrix: {rotation},   Translation Vector: {translation}')
+    #print(f'Tag id: {tag.tag_id},   Rotation matrix: {rotation},   Translation Vector: {translation}')
 
     # Calculate the pitch angle (in degrees)
     pitch = np.arcsin(-rotation[2, 0]) * 180/np.pi
@@ -180,10 +187,10 @@ def draw_tags(image, tags, elapsed_time):
     yaw = np.arctan2(rotation[1, 0], rotation[0, 0]) * 180/np.pi
 
     # Print the Euler angles
-    print("Pitch: {:.2f} degrees".format(pitch))
-    print("Roll: {:.2f} degrees".format(roll))
-    print("Yaw: {:.2f} degrees".format(yaw))
-    print('-----------------------------------------------------')
+    #print("Pitch: {:.2f} degrees".format(pitch))
+    #print("Roll: {:.2f} degrees".format(roll))
+    #print("Yaw: {:.2f} degrees".format(yaw))
+    #print('-----------------------------------------------------')
 
   # Processing time
   cv.putText(image,
