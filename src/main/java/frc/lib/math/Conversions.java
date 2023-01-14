@@ -39,32 +39,30 @@ public class Conversions {
     }
 
     /**
-     * @param velocityCounts Falcon Velocity Counts
-     * @param gearRatio Gear Ratio between Falcon and Mechanism (set to 1 for Falcon RPM)
+     * @param velocityCounts Spark Rotation per Second
+     * @param gearRatio Gear Ratio between NEO and Mechanism (set to 1 for Falcon RPM)
      * @return RPM of Mechanism
      */
     public static double sparkToRPM(double velocityCounts, double gearRatio) {
-        double motorRPM = velocityCounts * (600.0 / 2048.0);        
-        double mechRPM = motorRPM / gearRatio;
+        double mechRPM = velocityCounts / gearRatio;
         return mechRPM;
     }
 
     /**
      * @param RPM RPM of mechanism
-     * @param gearRatio Gear Ratio between Falcon and Mechanism (set to 1 for Falcon RPM)
-     * @return RPM of Mechanism
+     * @param gearRatio Gear Ratio between NEO and Mechanism (set to 1 for Falcon RPM)
+     * @return RPM of Motor
      */
     public static double RPMToSpark(double RPM, double gearRatio) {
         double motorRPM = RPM * gearRatio;
-        double sensorCounts = motorRPM * (2048.0 / 600.0);
-        return sensorCounts;
+        return motorRPM;
     }
 
     /**
-     * @param velocitycounts Falcon Velocity Counts
+     * @param velocitycounts Spark RPM
      * @param circumference Circumference of Wheel
-     * @param gearRatio Gear Ratio between Falcon and Mechanism (set to 1 for Falcon MPS)
-     * @return Falcon Velocity Counts
+     * @param gearRatio Gear Ratio between NEO and Mechanism (set to 1 for Falcon MPS)
+     * @return Meters per Second
      */
     public static double sparkToMPS(double velocitycounts, double circumference, double gearRatio){
         double wheelRPM = sparkToRPM(velocitycounts, gearRatio);
@@ -75,32 +73,32 @@ public class Conversions {
     /**
      * @param velocity Velocity MPS
      * @param circumference Circumference of Wheel
-     * @param gearRatio Gear Ratio between Falcon and Mechanism (set to 1 for Falcon MPS)
-     * @return Falcon Velocity Counts
+     * @param gearRatio Gear Ratio between NEO and Mechanism (set to 1 for Falcon MPS)
+     * @return Spark Velocity Counts
      */
-    public static double MPSToFalcon(double velocity, double circumference, double gearRatio){
+    public static double MPSToSpark(double velocity, double circumference, double gearRatio){
         double wheelRPM = ((velocity * 60) / circumference);
         double wheelVelocity = RPMToSpark(wheelRPM, gearRatio);
         return wheelVelocity;
     }
 
     /**
-     * @param positionCounts Falcon Position Counts
+     * @param positionCounts Spark Position Counts
      * @param circumference Circumference of Wheel
-     * @param gearRatio Gear Ratio between Falcon and Wheel
+     * @param gearRatio Gear Ratio between NEO and Wheel
      * @return Meters
      */
     public static double sparkToMeters(double positionCounts, double circumference, double gearRatio){
-        return positionCounts * (circumference / (gearRatio * 2048.0));
+        return positionCounts * circumference;
     }
 
     /**
      * @param meters Meters
      * @param circumference Circumference of Wheel
-     * @param gearRatio Gear Ratio between Falcon and Wheel
-     * @return Falcon Position Counts
+     * @param gearRatio Gear Ratio between NEO and Wheel
+     * @return Spark Position Counts
      */
     public static double MetersToSpark(double meters, double circumference, double gearRatio){
-        return meters / (circumference / (gearRatio * 2048.0));
+        return meters / circumference;
     }
 }
