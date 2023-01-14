@@ -1,10 +1,16 @@
 import cv2 as cv
 import numpy as np
 from pupil_apriltags import Detector
+from networktables import NetworkTables
 import os
 import glob
 import time
 import copy
+
+#initialize network tables
+NetworkTables.initialize(server='roborio-20-frc.local')
+pose_table = NetworkTables.getInstance().getTable('apriltag_poses')
+elapsed_time = 0
 
 def calibrate_camera():
   # Define the dimensions of checkerboard
@@ -66,7 +72,7 @@ def main():
   w = 1280
   h = 720
 
-  cap = cv.VideoCapture(2)
+  cap = cv.VideoCapture(14)
   ret, camera_mtx, distortion_mtx, r_vecs, t_vecs = calibrate_camera()
 
   detector = Detector(families='tag16h5', decode_sharpening=0.025, refine_edges=5, quad_decimate=0.125, quad_sigma=2)
@@ -79,8 +85,8 @@ def main():
   mapx, mapy = cv.initUndistortRectifyMap(camera_mtx, distortion_mtx, None, new_camera_mtx, (w,h), 5)
 
   k_tag_size = 0.1524
-
-  elapsed_time = 0
+  
+  
   
   while(True):
     start_time = time.time()
@@ -191,6 +197,7 @@ def draw_tags(image, tags, elapsed_time):
     #print("Roll: {:.2f} degrees".format(roll))
     #print("Yaw: {:.2f} degrees".format(yaw))
     #print('-----------------------------------------------------')
+    pose_table.putNumberArray('tagid'+ str(tag_id), translation);
 
   # Processing time
   cv.putText(image,
