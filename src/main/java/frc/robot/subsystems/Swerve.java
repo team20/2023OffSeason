@@ -35,7 +35,9 @@ public class Swerve extends SubsystemBase {
         swerveOdometry = new SwerveDriveOdometry(Constants.Swerve.swerveKinematics, getYaw(), getModulePositions());
     }
 
-    public void drive(Translation2d translation, double rotation, boolean fieldRelative, boolean isOpenLoop) {
+    /*public void driveOld(Translation2d translation, double rotation, boolean fieldRelative, boolean isOpenLoop) {
+        System.out.println("X: " +translation.getX());
+        System.out.println("Y: " + translation.getY());
         SwerveModuleState[] swerveModuleStates =
             Constants.Swerve.swerveKinematics.toSwerveModuleStates(
                 fieldRelative ? ChassisSpeeds.fromFieldRelativeSpeeds(
@@ -45,16 +47,37 @@ public class Swerve extends SubsystemBase {
                                     getYaw()
                                 )
                                 : new ChassisSpeeds(
-                                    translation.getX(), 
-                                    translation.getY(), 
+                                    translation.getX(),  
+                                    translation.getY(),                                 
                                     rotation)
                                 );
         SwerveDriveKinematics.desaturateWheelSpeeds(swerveModuleStates, Constants.Swerve.maxSpeed);
+        System.out.println(swerveModuleStates[0].angle);
+        mSwerveMods[0].setDesiredState(swerveModuleStates[0], isOpenLoop);
+        // for(SwerveModule mod : mSwerveMods){
+        //     mod.setDesiredState(swerveModuleStates[mod.moduleNumber], isOpenLoop);
+        // }
+    }*/
 
-        for(SwerveModule mod : mSwerveMods){
-            mod.setDesiredState(swerveModuleStates[mod.moduleNumber], isOpenLoop);
+    public void drive(Translation2d translation, double rotation, boolean fieldRelative, boolean isOpenLoop) {
+        // System.out.println("X: " + translation.getX());
+        // System.out.println("Y: " + translation.getY());
+        // System.out.println("Rotation: " + rotation);
+        ChassisSpeeds chassisSpeeds;
+        if (fieldRelative) {
+            chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(translation.getX(), translation.getY(), rotation, getYaw());
+        } else {
+            chassisSpeeds = new ChassisSpeeds(translation.getX(), translation.getY(), rotation);
         }
-    }    
+        SwerveModuleState[] swerveModuleStates =
+                Constants.Swerve.swerveKinematics.toSwerveModuleStates(chassisSpeeds);
+        SwerveDriveKinematics.desaturateWheelSpeeds(swerveModuleStates, Constants.Swerve.maxSpeed);
+        System.out.println(swerveModuleStates[0].angle);
+
+        // Set just one module state
+        // System.out.println("Swerve module state: " + swerveModuleStates[0]);
+        mSwerveMods[0].setDesiredState(swerveModuleStates[0], isOpenLoop);
+    }
 
     /* Used by SwerveControllerCommand in Auto */
     public void setModuleStates(SwerveModuleState[] desiredStates) {

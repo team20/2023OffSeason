@@ -45,7 +45,8 @@ public class SparkSwerveConstants {
         boolean driveMotorInvert = false;
         boolean angleMotorInvert = false;
         boolean canCoderInvert = false;
-        return new SparkSwerveConstants(wheelDiameter, angleGearRatio, driveGearRatio, angleKP, angleKI, angleKD, angleKF, driveMotorInvert, angleMotorInvert, canCoderInvert);
+        return new SparkSwerveConstants(wheelDiameter, angleGearRatio, driveGearRatio, angleKP, angleKI, angleKD,
+                angleKF, driveMotorInvert, angleMotorInvert, canCoderInvert);
     }
 
     /** Swerve Drive Specialties - MK4 Module*/
@@ -63,7 +64,8 @@ public class SparkSwerveConstants {
         boolean driveMotorInvert = false;
         boolean angleMotorInvert = false;
         boolean canCoderInvert = false;
-        return new SparkSwerveConstants(wheelDiameter, angleGearRatio, driveGearRatio, angleKP, angleKI, angleKD, angleKF, driveMotorInvert, angleMotorInvert, canCoderInvert);
+        return new SparkSwerveConstants(wheelDiameter, angleGearRatio, driveGearRatio, angleKP, angleKI, angleKD,
+                angleKF, driveMotorInvert, angleMotorInvert, canCoderInvert);
     }
 
     /** Swerve Drive Specialties - MK4i Module*/
@@ -81,11 +83,12 @@ public class SparkSwerveConstants {
         boolean driveMotorInvert = false;
         boolean angleMotorInvert = true;
         boolean canCoderInvert = false;
-        return new SparkSwerveConstants(wheelDiameter, angleGearRatio, driveGearRatio, angleKP, angleKI, angleKD, angleKF, driveMotorInvert, angleMotorInvert, canCoderInvert);
+        return new SparkSwerveConstants(wheelDiameter, angleGearRatio, driveGearRatio, angleKP, angleKI, angleKD,
+                angleKF, driveMotorInvert, angleMotorInvert, canCoderInvert);
     }
 
     /* Drive Gear Ratios for all supported modules */
-    public class driveGearRatios{
+    public class driveGearRatios {
         /* SDS MK3 */
         /** SDS MK3 - 8.16 : 1 */
         public static final double SDSMK3_Standard = (8.16 / 1.0);
@@ -101,7 +104,7 @@ public class SparkSwerveConstants {
         public static final double SDSMK4_L3 = (6.12 / 1.0);
         /** SDS MK4 - 5.14 : 1 */
         public static final double SDSMK4_L4 = (5.14 / 1.0);
-        
+
         /* SDS MK4i */
         /** SDS MK4i - 8.14 : 1 */
         public static final double SDSMK4i_L1 = (8.14 / 1.0);
@@ -111,5 +114,4 @@ public class SparkSwerveConstants {
         public static final double SDSMK4i_L3 = (6.12 / 1.0);
     }
 }
-
   

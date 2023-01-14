@@ -1,14 +1,10 @@
 package frc.robot;
 
-import com.ctre.phoenix.motorcontrol.ControlMode;
-import com.ctre.phoenix.motorcontrol.DemandType;
-import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.ctre.phoenix.sensors.CANCoder;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.SparkMaxAbsoluteEncoder;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.SparkMaxAbsoluteEncoder.Type;
-
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
@@ -68,10 +64,13 @@ public class SwerveModule {
     }
 
     private void setAngle(SwerveModuleState desiredState){
-        Rotation2d angle = (Math.abs(desiredState.speedMetersPerSecond) <= (Constants.Swerve.maxSpeed * 0.01)) ? lastAngle : desiredState.angle; //Prevent rotating module if speed is less then 1%. Prevents Jittering.
-        
-        //mAngleMotor.set(ControlMode.Position, Conversions.degreesToSpark(angle.getDegrees(), Constants.Swerve.angleGearRatio));
-        lastAngle = angle;
+        //System.out.println("Speed: " + desiredState.speedMetersPerSecond);
+        boolean isSpeedLessThanOnePercent = (Math.abs(desiredState.speedMetersPerSecond) <= (Constants.Swerve.maxSpeed * 0.01));
+        Rotation2d angle = isSpeedLessThanOnePercent ? lastAngle : desiredState.angle; //Prevent rotating module if speed is less then 1%. Prevents Jittering.
+        double angleDeg = angle.getDegrees()/(1800.0/Math.PI);
+        //System.out.println("Angle: " + angleDeg);
+        mAngleMotor.set(angleDeg);
+        //lastAngle = angle;
     }
 
     private Rotation2d getAngle(){
