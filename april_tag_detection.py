@@ -182,11 +182,14 @@ def draw_tags(image, tags):
 
 
 if __name__ == "__main__":
+    # TODO: create a network table linked to SmartDashboard
+    save_images=False
+#    save_images=True
     cap = cv.VideoCapture(0)
     tag_size = 0.1524
     detector = AprilTagDetector('./calib_images/*.jpg', (600, 600), show=True)
-    i = 0
-    print('frame ID; tag ID; tag family; translation (x); translation (y); translation (z); roll (degrees); pitch (degrees); yaw (degrees)')
+    i = -1
+    print('frame ID; tag family; tag ID; translation (x); translation (y); translation (z); roll (degrees); pitch (degrees); yaw (degrees)')
     while (True):
         start_time = time.time()
         ret, frame = cap.read()
@@ -195,13 +198,14 @@ if __name__ == "__main__":
         # detect tags from the current frame
         tags = detector.tags(frame, tag_size)
         if len(tags) > 0:
-            cv.imwrite('images' + os.sep + str(i) + '.jpg', frame)
             i = i+1
+            if save_images:
+                cv.imwrite('images' + os.sep + str(i) + '.jpg', frame)
         for tag in tags:  # for each tag detected
             # calculate the translation vector and the rotation angles
-            translation, roll, pitch, yaw = analyze(tag)
-            print(f'{i}; {tag.tag_id}; {tag.tag_family}; ' +
-                  "{:.3f}; {:.3f}; {:.3f}; {:.2f}; {:.2f}; {:.2f}; ".format(translation[0], translation[1], translation[2], roll, pitch, yaw))
+            info = pose_info(tag)
+            print(f'{i}; {tag.tag_family}; ' + info)
+        # TODO: save an array of pose_info strings in the SmartDashboard (key: tags)
         cv.putText(frame, "elapsed time:" + '{:.1f}'.format((time.time() - start_time) *
                    1000) + "ms", (10, 30), cv.FONT_HERSHEY_SIMPLEX, 0.8, (0, 255, 0), 2, cv.LINE_AA)
         cv.imshow('AprilTag Detection', draw_tags(frame, tags))
@@ -210,3 +214,4 @@ if __name__ == "__main__":
             break
     cap.release()
     cv.destroyAllWindows()
+
