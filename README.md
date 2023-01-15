@@ -14,6 +14,7 @@ branch for now.
 
  * [What is WPILib](https://docs.wpilib.org/en/stable/docs/software/what-is-wpilib.html)
  * [WPILib Java Source Code](https://github.com/wpilibsuite/allwpilib/tree/main/wpilibj/src/main/java/edu/wpi/first/wpilibj)
+ * [FRC Java Tutorial](https://frcteam3255.github.io/FRC-Java-Tutorial/) - very helpful for your first time!
 
 ## Recommended Tools
 
