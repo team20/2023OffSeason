@@ -165,9 +165,9 @@ def pose_info(tag):
         tag ID; x; y; z; roll; pitch; yaw
     """
     translation, roll, pitch, yaw = analyze(tag)
-    info = f"{tag.tag_id}; " + "{:.3f}; {:.3f}; {:.3f}; {:.2f}; {:.2f}; {:.2f}".format(
-        translation[0], translation[1], translation[2], roll, pitch, yaw)
-    return info
+    #info = f"{tag.tag_id}; " + "{:.3f}; {:.3f}; {:.3f}; {:.2f}; {:.2f}; {:.2f}".format(
+    #    translation[0], translation[1], translation[2])
+    return translation
 
 
 def draw_tags(image, tags):
@@ -205,12 +205,12 @@ def draw_tags(image, tags):
 if __name__ == "__main__":
     # TODO: create a network table linked to SmartDashboard
     NetworkTables.initialize(server='127.0.0.1')
-    table = NetworkTables.getTable("SmartDashboard")
+    table = NetworkTables.getTable("apriltag-poses")
     save_images=False
 #    save_images=True
-    cap = cv.VideoCapture(2)
+    cap = cv.VideoCapture(0)
     tag_size = 0.1524
-    detector = AprilTagDetector('./calib_images/*.jpg', (600, 600), show=True, calibrate=False)
+    detector = AprilTagDetector('./calib_images/*.jpg', (600, 600), show=True, calibrate=True)
     i = -1
     print('frame ID; tag family; tag ID; translation (x); translation (y); translation (z); roll (degrees); pitch (degrees); yaw (degrees)')
     while (True):
@@ -227,11 +227,11 @@ if __name__ == "__main__":
         l = []        
         for tag in tags:  # for each tag detected
             # calculate the translation vector and the rotation angles
-            info = pose_info(tag)
-            l.append(info)
-            print(f'{i}; {tag.tag_family}; ' + info)
-        # TODO: save an array of pose_info strings in the SmartDashboard (key: tags)
-        table.putStringArray('tags', l)
+            #info = pose_info(tag)
+            #l.append(info)
+            #print(f'{i}; {tag.tag_family}; ' + info)
+            # TODO: save an array of pose_info strings in the SmartDashboard (key: tags)
+            table.putNumberArray('tagid' + str(tag.tag_id), pose_info(tag))
         cv.putText(frame, "elapsed time:" + '{:.1f}'.format((time.time() - start_time) *
                    1000) + "ms", (10, 30), cv.FONT_HERSHEY_SIMPLEX, 0.8, (0, 255, 0), 2, cv.LINE_AA)
         cv.imshow('AprilTag Detection', draw_tags(frame, tags))
