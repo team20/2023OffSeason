@@ -2,6 +2,7 @@ import cv2 as cv
 import numpy as np
 import time
 from pupil_apriltags import Detector
+from networktables import NetworkTables
 import glob
 import os
 
@@ -183,6 +184,8 @@ def draw_tags(image, tags):
 
 if __name__ == "__main__":
     # TODO: create a network table linked to SmartDashboard
+    NetworkTables.initialize(server='127.0.0.1')
+    table = NetworkTables.getTable("SmartDashboard")
     save_images=False
 #    save_images=True
     cap = cv.VideoCapture(0)
@@ -201,11 +204,14 @@ if __name__ == "__main__":
             i = i+1
             if save_images:
                 cv.imwrite('images' + os.sep + str(i) + '.jpg', frame)
+        l = []        
         for tag in tags:  # for each tag detected
             # calculate the translation vector and the rotation angles
             info = pose_info(tag)
+            l.append(info)
             print(f'{i}; {tag.tag_family}; ' + info)
         # TODO: save an array of pose_info strings in the SmartDashboard (key: tags)
+        table.putStringArray('tags', l)
         cv.putText(frame, "elapsed time:" + '{:.1f}'.format((time.time() - start_time) *
                    1000) + "ms", (10, 30), cv.FONT_HERSHEY_SIMPLEX, 0.8, (0, 255, 0), 2, cv.LINE_AA)
         cv.imshow('AprilTag Detection', draw_tags(frame, tags))
