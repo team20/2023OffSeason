@@ -21,6 +21,9 @@ branch for now.
 
 Getting Started -> https://docs.wpilib.org/en/stable/docs/zero-to-robot/step-2/wpilib-setup.html
 
+Install FRC Game Tools -> https://docs.wpilib.org/en/stable/docs/zero-to-robot/step-2/frc-game-tools.html
+
+
 Download the ISO and install to get running.
 
  1. Microsoft Visual Studio Code, i.e., everyone's favorite editor
@@ -31,3 +34,7 @@ Download the ISO and install to get running.
  
  That's it!
  
+## Compiling
+
+Ctrl + Shift + P -> deploy (WPI Build Deploy)
+

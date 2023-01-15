@@ -25,8 +25,8 @@ public final class Constants {
                 SparkSwerveConstants.SDSMK4(SparkSwerveConstants.driveGearRatios.SDSMK4_L1);
 
         /* Drivetrain Constants */
-        public static final double trackWidth = Units.inchesToMeters(21.73); // TODO: This must be tuned to specific robot
-        public static final double wheelBase = Units.inchesToMeters(21.73); // TODO: This must be tuned to specific robot
+        public static final double trackWidth = Units.inchesToMeters(17.5);
+        public static final double wheelBase = Units.inchesToMeters(22.5);
         public static final double wheelCircumference = chosenModule.wheelCircumference;
 
         /*
@@ -76,7 +76,7 @@ public final class Constants {
         public static final double angleKD = chosenModule.angleKD;
         public static final double angleKF = chosenModule.angleKF;
 
-        /* Drive Motor PID Values */
+        /* Drive Motor PID Values */ // Probably not needed for open loop
         public static final double driveKP = 0.05; // TODO: This must be tuned to specific robot
         public static final double driveKI = 0.0;
         public static final double driveKD = 0.0;
@@ -92,7 +92,7 @@ public final class Constants {
 
         /* Swerve Profiling Values */
         /** Meters per Second */
-        public static final double maxSpeed = 1; // TODO: This must be tuned to specific robot
+        public static final double maxSpeed = 0.3; // TODO: This must be tuned to specific robot
         /** Radians per Second */
         public static final double maxAngularVelocity = 1.0; // TODO: This must be tuned to specific robot
 

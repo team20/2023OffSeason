@@ -24,14 +24,14 @@ import frc.robot.SwerveModule;
  */
 public class Swerve extends SubsystemBase {
 
-    private static final boolean SAMPLE_MODE = true;
+    private static final boolean SAMPLE_MODE = false;
     private static final Logger LOGGER = Logger.getLogger(Swerve.class.getName());
 
     public SwerveDriveOdometry swerveOdometry;
     public SwerveModule[] mSwerveMods;
     public Pigeon2 gyro;
 
-    private AtomicInteger count = new AtomicInteger();
+    //private AtomicInteger count = new AtomicInteger();
 
     public Swerve() {
         gyro = new Pigeon2(Constants.Swerve.pigeonID);
@@ -45,7 +45,8 @@ public class Swerve extends SubsystemBase {
             new SwerveModule(3, Constants.Swerve.Mod3.constants)
         };
 
-        swerveOdometry = new SwerveDriveOdometry(Constants.Swerve.swerveKinematics, getYaw(), getModulePositions());
+        swerveOdometry = new SwerveDriveOdometry(Constants.Swerve.swerveKinematics, getYaw(), 
+            getModulePositions());
     }  
 
     /**
@@ -90,9 +91,11 @@ public class Swerve extends SubsystemBase {
         SwerveDriveKinematics.desaturateWheelSpeeds(swerveModuleStates, Constants.Swerve.maxSpeed);
         System.out.println(swerveModuleStates[0].angle);
 
-        for(SwerveModule mod : mSwerveMods){
-            mod.setDesiredState(swerveModuleStates[mod.moduleNumber], true);
-        }
+        // for(SwerveModule mod : mSwerveMods){
+        //     mod.setDesiredState(swerveModuleStates[mod.moduleNumber], true);
+        // }
+        SwerveModule mod = mSwerveMods[0];
+        mod.setDesiredState(swerveModuleStates[mod.moduleNumber], true);
     }
 
     private void driveAllModules(Translation2d translation, double rotation, boolean fieldRelative, boolean isOpenLoop) {
@@ -114,9 +117,12 @@ public class Swerve extends SubsystemBase {
         System.out.println(swerveModuleStates[0].angle);
 
         // System.out.println("Swerve module state: " + swerveModuleStates[0]);
-        for(SwerveModule mod : mSwerveMods){
-            mod.setDesiredState(swerveModuleStates[mod.moduleNumber], isOpenLoop);
-        }
+        // for(SwerveModule mod : mSwerveMods){
+        //     mod.setDesiredState(swerveModuleStates[mod.moduleNumber], isOpenLoop);
+        // }
+
+        SwerveModule mod = mSwerveMods[0];
+        mod.setDesiredState(swerveModuleStates[mod.moduleNumber], true);
     }
 
     /* Used by SwerveControllerCommand in Auto */
