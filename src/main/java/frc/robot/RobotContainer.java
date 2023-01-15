@@ -36,9 +36,11 @@ public class RobotContainer {
 
     /** The container for the robot. Contains subsystems, OI devices, and commands. */
     public RobotContainer() {
+
+        // The default command is scheduled and run whenever no other command has been issued.
         s_Swerve.setDefaultCommand(
             new TeleopSwerve(
-                s_Swerve, 
+                s_Swerve,
                 () -> -driver.getRawAxis(translationAxis), 
                 () -> -driver.getRawAxis(strafeAxis), 
                 () -> -driver.getRawAxis(2),

@@ -10,7 +10,12 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
-
+/**
+ * Directs the Swerve motors operation from manual controller inputs.
+ * 
+ * This is considered tele-operation (tele-op).
+ * 
+ */
 public class TeleopSwerve extends CommandBase {    
     private Swerve s_Swerve;    
     private DoubleSupplier translationSup;
@@ -30,12 +35,15 @@ public class TeleopSwerve extends CommandBase {
 
     @Override
     public void execute() {
-        /* Get Values, Deadband*/
+
+        // Round values near zero to zero, re-map remaining range to [0.0, 1.0].  Values greater than 1.0 are clamped to 1.0.
         double translationVal = MathUtil.applyDeadband(translationSup.getAsDouble(), Constants.stickDeadband);
         double strafeVal = MathUtil.applyDeadband(strafeSup.getAsDouble(), Constants.stickDeadband);
         double rotationVal = MathUtil.applyDeadband(rotationSup.getAsDouble(), Constants.stickDeadband);
+   
+        // TODO ensure Constants.Swerve are adjusted to this particular robot's configuration
 
-        /* Drive */
+        // Issue drive commands to swerve motor
         s_Swerve.drive(
             new Translation2d(translationVal, strafeVal).times(Constants.Swerve.maxSpeed), 
             rotationVal * Constants.Swerve.maxAngularVelocity, 

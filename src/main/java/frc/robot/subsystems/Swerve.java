@@ -1,5 +1,8 @@
 package frc.robot.subsystems;
 
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.logging.Logger;
+
 import com.ctre.phoenix.sensors.Pigeon2;
 
 import edu.wpi.first.math.geometry.Pose2d;
@@ -15,10 +18,20 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.SwerveModule;
 
+
+/**
+ * Drive subsystem composed of all 4 Swerve MK4 modules.
+ */
 public class Swerve extends SubsystemBase {
+
+    private static final boolean SAMPLE_MODE = true;
+    private static final Logger LOGGER = Logger.getLogger(Swerve.class.getName());
+
     public SwerveDriveOdometry swerveOdometry;
     public SwerveModule[] mSwerveMods;
     public Pigeon2 gyro;
+
+    private AtomicInteger count = new AtomicInteger();
 
     public Swerve() {
         gyro = new Pigeon2(Constants.Swerve.pigeonID);
@@ -33,33 +46,57 @@ public class Swerve extends SubsystemBase {
         };
 
         swerveOdometry = new SwerveDriveOdometry(Constants.Swerve.swerveKinematics, getYaw(), getModulePositions());
+    }  
+
+    /**
+     * Engage the drive motors.
+     * 
+     * @param translation   
+     *   X and Y movement.  The y movement seems to be "strafe"?
+     * @param rotation
+     *   Rotation of the motor?
+     * @param fieldRelative 
+     *   If true, plot relative to the competition field using an inertial gyro (?).
+     * @param isOpenLoop
+     *   If true, assume there is no "closed loop" feedback from the motor sensors and that all inputs are manually drive (and not really a loop at all).
+     */
+    public void drive(Translation2d translation, double rotation, boolean fieldRelative, boolean isOpenLoop) {
+
+        LOGGER.info("drive(): t=" + translation + ", r=" + rotation + ", fieldRelative=" + fieldRelative + ", isOpenLoop=" + isOpenLoop);
+
+        // Ignore input and just run a sample command.
+        if (SAMPLE_MODE) {
+            sampleDriveOpenLoop(false);
+        } else {
+            driveAllModules(translation, rotation, fieldRelative, isOpenLoop);
+        }
     }
 
-    /*public void driveOld(Translation2d translation, double rotation, boolean fieldRelative, boolean isOpenLoop) {
-        System.out.println("X: " +translation.getX());
-        System.out.println("Y: " + translation.getY());
+    /**
+     * Sample drive program to debug the modules and make sure they are behaving.
+     */
+    private void sampleDriveOpenLoop(boolean fieldRelative) {
+
+        double vxMetersPerSecond = 0.0;
+        double vyMetersPerSecond = 0.0;
+        double omegaRadiansPerSecond = 0.0;
+    
+        // TODO what does inverse kinematics mean in the context of the wpi library
+        ChassisSpeeds chassisSpeeds = new ChassisSpeeds(vxMetersPerSecond, vyMetersPerSecond, omegaRadiansPerSecond);
+
+        // Use the preset kinematics for the robot to figure out how to move the wheels.
         SwerveModuleState[] swerveModuleStates =
-            Constants.Swerve.swerveKinematics.toSwerveModuleStates(
-                fieldRelative ? ChassisSpeeds.fromFieldRelativeSpeeds(
-                                    translation.getX(), 
-                                    translation.getY(), 
-                                    rotation, 
-                                    getYaw()
-                                )
-                                : new ChassisSpeeds(
-                                    translation.getX(),  
-                                    translation.getY(),                                 
-                                    rotation)
-                                );
+                Constants.Swerve.swerveKinematics.toSwerveModuleStates(chassisSpeeds);
         SwerveDriveKinematics.desaturateWheelSpeeds(swerveModuleStates, Constants.Swerve.maxSpeed);
         System.out.println(swerveModuleStates[0].angle);
-        mSwerveMods[0].setDesiredState(swerveModuleStates[0], isOpenLoop);
-        // for(SwerveModule mod : mSwerveMods){
-        //     mod.setDesiredState(swerveModuleStates[mod.moduleNumber], isOpenLoop);
-        // }
-    }*/
 
-    public void drive(Translation2d translation, double rotation, boolean fieldRelative, boolean isOpenLoop) {
+        for(SwerveModule mod : mSwerveMods){
+            mod.setDesiredState(swerveModuleStates[mod.moduleNumber], true);
+        }
+    }
+
+    private void driveAllModules(Translation2d translation, double rotation, boolean fieldRelative, boolean isOpenLoop) {
+
         // System.out.println("X: " + translation.getX());
         // System.out.println("Y: " + translation.getY());
         // System.out.println("Rotation: " + rotation);
@@ -69,14 +106,17 @@ public class Swerve extends SubsystemBase {
         } else {
             chassisSpeeds = new ChassisSpeeds(translation.getX(), translation.getY(), rotation);
         }
+
+        // Use the preset kinematics for the robot to figure out how to move the wheels.
         SwerveModuleState[] swerveModuleStates =
                 Constants.Swerve.swerveKinematics.toSwerveModuleStates(chassisSpeeds);
         SwerveDriveKinematics.desaturateWheelSpeeds(swerveModuleStates, Constants.Swerve.maxSpeed);
         System.out.println(swerveModuleStates[0].angle);
 
-        // Set just one module state
         // System.out.println("Swerve module state: " + swerveModuleStates[0]);
-        mSwerveMods[0].setDesiredState(swerveModuleStates[0], isOpenLoop);
+        for(SwerveModule mod : mSwerveMods){
+            mod.setDesiredState(swerveModuleStates[mod.moduleNumber], isOpenLoop);
+        }
     }
 
     /* Used by SwerveControllerCommand in Auto */
@@ -86,7 +126,7 @@ public class Swerve extends SubsystemBase {
         for(SwerveModule mod : mSwerveMods){
             mod.setDesiredState(desiredStates[mod.moduleNumber], false);
         }
-    }    
+    }
 
     public Pose2d getPose() {
         return swerveOdometry.getPoseMeters();

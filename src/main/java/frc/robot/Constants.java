@@ -9,7 +9,12 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
 import frc.lib.util.SwerveModuleConstants;
 
+/**
+ * Grab-bag of constants.
+ */
 public final class Constants {
+
+    /** Inputs from the controller with less than this values are blanked out and do not result in any motor action. */
     public static final double stickDeadband = 0.1;
 
     public static final class Swerve {
@@ -20,16 +25,14 @@ public final class Constants {
                 SparkSwerveConstants.SDSMK4(SparkSwerveConstants.driveGearRatios.SDSMK4_L1);
 
         /* Drivetrain Constants */
-        public static final double trackWidth = Units.inchesToMeters(21.73); // TODO: This must be tuned to specific
-                                                                             // robot
-        public static final double wheelBase = Units.inchesToMeters(21.73); // TODO: This must be tuned to specific
-                                                                            // robot
+        public static final double trackWidth = Units.inchesToMeters(21.73); // TODO: This must be tuned to specific robot
+        public static final double wheelBase = Units.inchesToMeters(21.73); // TODO: This must be tuned to specific robot
         public static final double wheelCircumference = chosenModule.wheelCircumference;
 
         /*
          * Swerve Kinematics
          * No need to ever change this unless you are not doing a traditional
-         * rectangular/square 4 module swerve
+         * rectangular/square 4 module swerve.
          */
         public static final SwerveDriveKinematics swerveKinematics = new SwerveDriveKinematics(
                 new Translation2d(wheelBase / 2.0, trackWidth / 2.0),
