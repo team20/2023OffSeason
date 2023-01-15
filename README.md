@@ -19,10 +19,13 @@ branch for now.
 
 ## Recommended Tools
 
-Recommend installing [Chocolatey](https://chocolatey.org/install) then using that to install all the software below via `chocolatey install -y <app-name>`
+Getting Started -> https://docs.wpilib.org/en/stable/docs/zero-to-robot/step-2/wpilib-setup.html
 
- 1. `vscode` - Microsoft Visual Studio Code, i.e., everyone's favorite editor
+Download the ISO and install to get running.
+
+ 1. Microsoft Visual Studio Code, i.e., everyone's favorite editor
  2. GitHub Desktop - nice UI for managing GitHub repositories
+ 3. Git Client for Windows
  3. Temurin11 (Java Development Kit 11) - Needed to run Gradle
  4. Gradle - tool that compiles the Java application then deploys it to the robot
  
