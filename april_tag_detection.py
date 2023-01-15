@@ -4,8 +4,9 @@ import time
 from pupil_apriltags import Detector
 import glob
 import os
+import pickle
 
-__author__ = '{Andrew Hwang, Jeong Hwang}'
+__author__ = '{Andrew Hwang, Jeong Hwang, Khai Hern Low}'
 
 
 class AprilTagDetector:
@@ -13,7 +14,7 @@ class AprilTagDetector:
     An AprilTagDetector can detect AprilTags from images
     """
 
-    def __init__(self, directory, size, show=False):
+    def __init__(self, directory, size, show=False, calibrate=False):
         """
         Constructs an AprilTagDetector.
 
@@ -24,44 +25,63 @@ class AprilTagDetector:
         size : (int, int)
             The width and height of the video frames
         show : Boolean, optional
-            Whether or not to show te images used for camera calibration (default is False)
+            Whether or not to show the images used for camera calibration (default is False)
+        calibrate : Boolean, optional
+            Whether or not to calibrate a camera and save the coefficients to a file (default is False)
         """
         w = size[0]
         h = size[1]
-        CHESSBOARD = (6, 8)  # the dimensions of chessboard
-        # criteria for stopping the loop for finding chessboard corners: the specified accuracy, epsilon, is reached or the specified number of iterations are completed.
-        criteria = (cv.TERM_CRITERIA_EPS +
-                    cv.TERM_CRITERIA_MAX_ITER, 30, 0.001)
-        points3D = []  # vector for 3D chessboard corners
-        points2D = []  # vector for 2D chessboard corners
-        #  3D chessboard corners
-        corners3d = np.zeros((1, CHESSBOARD[0] * CHESSBOARD[1], 3), np.float32)
-        corners3d[0, :, :2] = np.mgrid[0:CHESSBOARD[0],
-                                       0:CHESSBOARD[1]].T.reshape(-1, 2)
-        # for each image file in the specified directory
-        for filename in glob.glob(directory):
-            image = cv.imread(filename)
-            gray_image = cv.cvtColor(image, cv.COLOR_BGR2GRAY)
-            # find the chessboard corners
-            ret, corners = cv.findChessboardCorners(
-                gray_image, CHESSBOARD, cv.CALIB_CB_ADAPTIVE_THRESH + cv.CALIB_CB_FAST_CHECK + cv.CALIB_CB_NORMALIZE_IMAGE)
-            if ret == True:  # if the chessboard corners found
-                # refine the coordinates of the 2D chessboard corners
-                corners2d = cv.cornerSubPix(
-                    gray_image, corners, (11, 11), (-1, -1), criteria)
-                # register 3D chessboard corners as object points
-                points3D.append(corners3d)
-                # register 2D chessboard corners as image points
-                points2D.append(corners2d)
-                image = cv.drawChessboardCorners(
-                    image, CHESSBOARD, corners2d, ret)  # mark chessboard corners
-            if show:
-                cv.imshow('img', image)
-                cv.waitKey(0)
-        cv.destroyAllWindows()
-        # perform camera calibration based on the 3D chessboard corners and 2D chessboard corners
-        ret, camera_mtx, distortion_mtx, r_vecs, t_vecs = cv.calibrateCamera(
-            points3D, points2D, gray_image.shape[::-1], None, None)
+        if (calibrate):
+            CHESSBOARD = (6, 8)  # the dimensions of chessboard
+            # criteria for stopping the loop for finding chessboard corners: the specified accuracy, epsilon, is reached or the specified number of iterations are completed.
+            criteria = (cv.TERM_CRITERIA_EPS +
+                        cv.TERM_CRITERIA_MAX_ITER, 30, 0.001)
+            points3D = []  # vector for 3D chessboard corners
+            points2D = []  # vector for 2D chessboard corners
+            #  3D chessboard corners
+            corners3d = np.zeros((1, CHESSBOARD[0] * CHESSBOARD[1], 3), np.float32)
+            corners3d[0, :, :2] = np.mgrid[0:CHESSBOARD[0],
+                                        0:CHESSBOARD[1]].T.reshape(-1, 2)
+            # for each image file in the specified directory
+            for filename in glob.glob(directory):
+                image = cv.imread(filename)
+                gray_image = cv.cvtColor(image, cv.COLOR_BGR2GRAY)
+                # find the chessboard corners
+                ret, corners = cv.findChessboardCorners(
+                    gray_image, CHESSBOARD, cv.CALIB_CB_ADAPTIVE_THRESH + cv.CALIB_CB_FAST_CHECK + cv.CALIB_CB_NORMALIZE_IMAGE)
+                if ret == True:  # if the chessboard corners found
+                    # refine the coordinates of the 2D chessboard corners
+                    corners2d = cv.cornerSubPix(
+                        gray_image, corners, (11, 11), (-1, -1), criteria)
+                    # register 3D chessboard corners as object points
+                    points3D.append(corners3d)
+                    # register 2D chessboard corners as image points
+                    points2D.append(corners2d)
+                    image = cv.drawChessboardCorners(
+                        image, CHESSBOARD, corners2d, ret)  # mark chessboard corners
+                if show:
+                    cv.imshow('img', image)
+                    cv.waitKey(0)
+            cv.destroyAllWindows()
+            # perform camera calibration based on the 3D chessboard corners and 2D chessboard corners
+            ret, camera_mtx, distortion_mtx, r_vecs, t_vecs = cv.calibrateCamera(
+                points3D, points2D, gray_image.shape[::-1], None, None)
+
+            # save the coefficients produce by the camera calibration to 'camera_calib_pickle.p' file
+            calib_result_pickle = {}
+            calib_result_pickle['camera_mtx'] = camera_mtx
+            calib_result_pickle['distortion_mtx'] = distortion_mtx
+            calib_result_pickle['r_vecs'] = r_vecs
+            calib_result_pickle['t_vecs'] = t_vecs
+            pickle.dump(calib_result_pickle, open('camera_calib_pickle.p', 'wb' )) 
+        else:
+            # load the coefficients from the file
+            calib_result_pickle = pickle.load(open('camera_calib_pickle.p', 'rb' ))
+            camera_mtx = calib_result_pickle['camera_mtx']
+            distortion_mtx = calib_result_pickle['distortion_mtx']
+            r_vecs = calib_result_pickle['r_vecs']
+            t_vecs = calib_result_pickle['t_vecs']
+
         self.camera_params = [
             camera_mtx[0, 0], camera_mtx[1, 1], camera_mtx[2, 0], camera_mtx[2, 1]]
         new_camera_mtx, roi = cv.getOptimalNewCameraMatrix(
@@ -185,9 +205,9 @@ if __name__ == "__main__":
     # TODO: create a network table linked to SmartDashboard
     save_images=False
 #    save_images=True
-    cap = cv.VideoCapture(0)
+    cap = cv.VideoCapture(2)
     tag_size = 0.1524
-    detector = AprilTagDetector('./calib_images/*.jpg', (600, 600), show=True)
+    detector = AprilTagDetector('./calib_images/*.jpg', (600, 600), show=True, calibrate=False)
     i = -1
     print('frame ID; tag family; tag ID; translation (x); translation (y); translation (z); roll (degrees); pitch (degrees); yaw (degrees)')
     while (True):
@@ -209,7 +229,7 @@ if __name__ == "__main__":
         cv.putText(frame, "elapsed time:" + '{:.1f}'.format((time.time() - start_time) *
                    1000) + "ms", (10, 30), cv.FONT_HERSHEY_SIMPLEX, 0.8, (0, 255, 0), 2, cv.LINE_AA)
         cv.imshow('AprilTag Detection', draw_tags(frame, tags))
-        key = cv.waitKey(500)
+        key = cv.waitKey(1)
         if key != -1:  # if some key pressed, then exit
             break
     cap.release()
