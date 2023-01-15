@@ -8,8 +8,8 @@ import time
 import copy
 
 #initialize network tables
-NetworkTables.initialize(server='roborio-20-frc.local')
-pose_table = NetworkTables.getInstance().getTable('apriltag_poses')
+#NetworkTables.initialize(server='127.0.0.1')
+#pose_table = NetworkTables.getTable("SmartDashboard")
 elapsed_time = 0
 
 def calibrate_camera():
@@ -72,7 +72,7 @@ def main():
   w = 1280
   h = 720
 
-  cap = cv.VideoCapture(14)
+  cap = cv.VideoCapture(0)
   ret, camera_mtx, distortion_mtx, r_vecs, t_vecs = calibrate_camera()
 
   detector = Detector(families='tag16h5', decode_sharpening=0.025, refine_edges=5, quad_decimate=0.125, quad_sigma=2)
@@ -197,7 +197,7 @@ def draw_tags(image, tags, elapsed_time):
     #print("Roll: {:.2f} degrees".format(roll))
     #print("Yaw: {:.2f} degrees".format(yaw))
     #print('-----------------------------------------------------')
-    pose_table.putNumberArray('tagid'+ str(tag_id), translation);
+    #pose_table.putNumberArray('tagid'+ str(tag_id), translation);
 
   # Processing time
   cv.putText(image,
