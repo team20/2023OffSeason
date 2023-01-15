@@ -10,7 +10,6 @@ import copy
 #initialize network tables
 #NetworkTables.initialize(server='127.0.0.1')
 #pose_table = NetworkTables.getTable("SmartDashboard")
-elapsed_time = 0
 
 def calibrate_camera():
   # Define the dimensions of checkerboard
@@ -72,7 +71,7 @@ def main():
   w = 1280
   h = 720
 
-  cap = cv.VideoCapture(0)
+  cap = cv.VideoCapture(2)
   ret, camera_mtx, distortion_mtx, r_vecs, t_vecs = calibrate_camera()
 
   detector = Detector(families='tag16h5', decode_sharpening=0.025, refine_edges=5, quad_decimate=0.125, quad_sigma=2)
@@ -86,7 +85,7 @@ def main():
 
   k_tag_size = 0.1524
   
-  
+  elapsed_time = 0
   
   while(True):
     start_time = time.time()
@@ -124,7 +123,7 @@ def main():
     #show screen
     cv.imshow('AprilTag Detect', debug_image)
 
-    #time.sleep(0.5)
+    time.sleep(0.5)
 
   cap.release()
   cv.destroyAllWindows()
@@ -166,6 +165,8 @@ def draw_tags(image, tags, elapsed_time):
                 cv.FONT_HERSHEY_SIMPLEX, 0.75, (0, 0, 255), 2, cv.LINE_AA)
 
     # Offset distances to correct 
+    tag.pose_t[0][0] -= 0.31
+    tag.pose_t[1][0] -= 0.215 
     tag.pose_t[2][0] /= 1.6 #offset z axis / distance
     print(tag.pose_t)
 
