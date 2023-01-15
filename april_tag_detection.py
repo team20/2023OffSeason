@@ -129,6 +129,26 @@ def analyze(tag):
     return translation, roll, pitch, yaw
 
 
+def pose_info(tag):
+    """
+    Returns a string representaton of the pose information of the spcified tag.
+
+    Parameters
+    ----------
+    tag
+        TBD
+
+    Returns
+    -------    
+    a string representaton of the pose information of the spcified tag in the form of
+        tag ID; x; y; z; roll; pitch; yaw
+    """
+    translation, roll, pitch, yaw = analyze(tag)
+    info = f"{tag.tag_id}; " + "{:.3f}; {:.3f}; {:.3f}; {:.2f}; {:.2f}; {:.2f}".format(
+        translation[0], translation[1], translation[2], roll, pitch, yaw)
+    return info
+
+
 def draw_tags(image, tags):
     """
     Draws the specifed tags on the spcified imae.
