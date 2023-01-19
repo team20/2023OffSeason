@@ -8,6 +8,7 @@ public class CalibrationAutoCommand extends CommandBase {
 
     public CalibrationAutoCommand(){
         m_driveSubsystem = DriveSubsystem.get();
+        addRequirements(DriveSubsystem.get());
     }
     @Override
     public void initialize() {
@@ -16,7 +17,7 @@ public class CalibrationAutoCommand extends CommandBase {
 
     @Override
     public void execute() {
-        m_driveSubsystem.setSteerMotors(Math.toRadians(90), Math.toRadians(90), 0, 0);
+        m_driveSubsystem.setSteerMotors(0, 0, 0, 0);
     }
     @Override
     public boolean isFinished() {

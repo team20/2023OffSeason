@@ -56,9 +56,6 @@ public final class Constants {
 	}
 
 	public static final class DriveConstants {
-		// Contains constants that are helpful
-		public static final SparkSwerveConstants chosenModule = // Swerve Module is MK4 L1
-				SparkSwerveConstants.SDSMK4(SparkSwerveConstants.driveGearRatios.SDSMK4_L1);
 		// CAN IDs
 		public static final int kFrontRightDrivePort = 3;
 		public static final int kFrontRightSteerPort = 4;
@@ -73,11 +70,11 @@ public final class Constants {
 		public static final int kBackRightCANCoderPort = 15;
 		public static final int kBackLeftCANCoderPort = 16;
 		// Drive PID values
-		public static final double kP = chosenModule.angleKP;
-		public static final double kI = chosenModule.angleKI;
-		public static final double kD = chosenModule.angleKD;
+		public static final double kP = 0.005;
+		public static final double kI = 0;
+		public static final double kD = 0;
 		public static final double kIz = 0;
-		public static final double kFF = chosenModule.angleKF;
+		public static final double kFF = 0;
 		public static final double kMinOutput = -1.0;
 		public static final double kMaxOutput = 1.0;
 		public static final AccelStrategy kTrapezoidal = AccelStrategy.kTrapezoidal;
@@ -86,10 +83,17 @@ public final class Constants {
 		public static final double kMaxVelocity = 0;
 		public static final double kAllowedError = 0;
 		public static final double kMinVelocity = 0;
-		/*** Distance between center of front wheel and center of back wheel*/
+		/*** Distance between center of front wheel and center of back wheel */
 		public static final double kWheelBase = 22.5;
-		/*** Distance between center of left wheel and center of right wheel*/
+		/*** Distance between center of left wheel and center of right wheel */
 		public static final double kTrackWidth = 17.5;
+		public static final double kSteerPeriod = 0.02;
+		public static final boolean kFrontLeftDriveInverted = true;
+		public static final boolean kBackLeftDriveInverted = true;
+		public static final boolean kFrontRightDriveInverted = false;
+		public static final boolean kBackRightDriveInverted = false;
+		// Speed multiplier to make sure the robot doesn't crash into something when
+		// testing, because crashing into people's shins would be bad
+		public static final double kSpeedMultiplier = 0.25;
 	}
 }
-
