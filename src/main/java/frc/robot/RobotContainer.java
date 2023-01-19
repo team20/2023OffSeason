@@ -9,6 +9,7 @@ import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.Constants.ControllerConstants;
 import frc.robot.Constants.ControllerConstants.Axis;
 import frc.robot.commands.DefaultDriveCommand;
 import frc.robot.commands.ResetToZeroDegreesCommand;
@@ -22,8 +23,8 @@ import frc.robot.subsystems.DriveSubsystem;
  * commands, and button mappings) should be declared here.
  */
 public class RobotContainer {
-  private final Joystick m_joystick = new Joystick(Constants.ControllerConstants.kDriverControllerPort);
-  private final GenericHID m_controller = new GenericHID(Constants.ControllerConstants.kDriverControllerPort);
+  private final Joystick m_joystick = new Joystick(ControllerConstants.kDriverControllerPort);
+  private final GenericHID m_controller = new GenericHID(ControllerConstants.kDriverControllerPort);
   private final DriveSubsystem m_driveSubsystem = new DriveSubsystem();
 
   /**
@@ -47,7 +48,7 @@ public class RobotContainer {
             () -> m_joystick.getRawAxis(Axis.kLeftX),
             () -> m_joystick.getRawAxis(Axis.kLeftY),
             () -> m_joystick.getRawAxis(Axis.kRightX)));
-    new Trigger(() -> m_controller.getRawButton(Constants.ControllerConstants.Button.kTriangle))
+    new Trigger(() -> m_controller.getRawButton(ControllerConstants.Button.kTriangle))
         .onTrue(new ResetToZeroDegreesCommand());
   }
 

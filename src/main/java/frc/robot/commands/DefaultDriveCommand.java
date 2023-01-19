@@ -9,7 +9,7 @@ import java.util.function.Supplier;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.Constants;
+import frc.robot.Constants.ControllerConstants;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.subsystems.DriveSubsystem;
 
@@ -52,9 +52,9 @@ public class DefaultDriveCommand extends CommandBase {
   public void execute() {
     // Get the foward, strafe, and rotation speed, using a deadband on the joystick
     // input so slight movements don't move the robot
-    double fwdSpeed = MathUtil.applyDeadband(m_yAxisDrive.get(), Constants.ControllerConstants.kDeadzone);
-    double strSpeed = MathUtil.applyDeadband(m_xAxisDrive.get(), Constants.ControllerConstants.kDeadzone);
-    double rotSpeed = MathUtil.applyDeadband(m_rotationAxis.get(), Constants.ControllerConstants.kDeadzone);
+    double fwdSpeed = MathUtil.applyDeadband(m_yAxisDrive.get(), ControllerConstants.kDeadzone);
+    double strSpeed = MathUtil.applyDeadband(m_xAxisDrive.get(), ControllerConstants.kDeadzone);
+    double rotSpeed = MathUtil.applyDeadband(m_rotationAxis.get(), ControllerConstants.kDeadzone);
     // Random intermediate math
     double a = strSpeed - rotSpeed * (m_wheelBase / 2);
     double b = strSpeed + rotSpeed * (m_wheelBase / 2);
