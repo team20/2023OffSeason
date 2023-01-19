@@ -5,7 +5,6 @@
 package frc.robot.subsystems;
 
 import com.ctre.phoenix.sensors.CANCoder;
-import com.ctre.phoenix.sensors.SensorInitializationStrategy;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
@@ -55,72 +54,43 @@ public class DriveSubsystem extends SubsystemBase {
     }
     s_subsystem = this;
 
-    // Initialize motors
+    // Initialize motors, PID controllers
     {
-      m_frontRightDriveMotor.restoreFactoryDefaults();
-      m_frontRightDriveMotor.setIdleMode(IdleMode.kBrake);
-      m_frontRightDriveMotor.enableVoltageCompensation(12);
-      m_frontRightDriveMotor.setSmartCurrentLimit(10);
-      m_frontRightDriveMotor.setInverted(DriveConstants.kFrontRightDriveInverted);
-
-      m_frontRightSteerMotor.restoreFactoryDefaults();
-      m_frontRightSteerMotor.setIdleMode(IdleMode.kBrake);
-      m_frontRightSteerMotor.enableVoltageCompensation(12);
-      m_frontRightSteerMotor.setSmartCurrentLimit(10);
-
-      m_frontRightCANCoder.configSensorInitializationStrategy(SensorInitializationStrategy.BootToAbsolutePosition);
-
-      m_frontRightPIDController.enableContinuousInput(0, 360);
-
-      m_frontLeftDriveMotor.restoreFactoryDefaults();
-      m_frontLeftDriveMotor.setIdleMode(IdleMode.kBrake);
-      m_frontLeftDriveMotor.enableVoltageCompensation(12);
-      m_frontLeftDriveMotor.setSmartCurrentLimit(10);
+      configMotorController(m_frontLeftDriveMotor);
       m_frontLeftDriveMotor.setInverted(DriveConstants.kFrontLeftDriveInverted);
-
-      m_frontLeftSteerMotor.restoreFactoryDefaults();
-      m_frontLeftSteerMotor.setIdleMode(IdleMode.kBrake);
-      m_frontLeftSteerMotor.enableVoltageCompensation(12);
-      m_frontLeftSteerMotor.setSmartCurrentLimit(10);
-
-      m_frontLeftCANCoder.configSensorInitializationStrategy(SensorInitializationStrategy.BootToAbsolutePosition);
+      configMotorController(m_frontLeftSteerMotor);
 
       m_frontLeftPIDController.enableContinuousInput(0, 360);
 
-      m_backRightDriveMotor.restoreFactoryDefaults();
-      m_backRightDriveMotor.setIdleMode(IdleMode.kBrake);
-      m_backRightDriveMotor.enableVoltageCompensation(12);
-      m_backRightDriveMotor.setSmartCurrentLimit(10);
-      m_backRightDriveMotor.setInverted(DriveConstants.kBackRightDriveInverted);
+      configMotorController(m_frontRightDriveMotor);
+      m_frontRightDriveMotor.setInverted(DriveConstants.kFrontRightDriveInverted);
+      configMotorController(m_frontRightSteerMotor);
 
-      m_backRightSteerMotor.restoreFactoryDefaults();
-      m_backRightSteerMotor.setIdleMode(IdleMode.kBrake);
-      m_backRightSteerMotor.enableVoltageCompensation(12);
-      m_backRightSteerMotor.setSmartCurrentLimit(10);
+      m_frontRightPIDController.enableContinuousInput(0, 360);
 
-      m_backRightCANCoder.configSensorInitializationStrategy(SensorInitializationStrategy.BootToAbsolutePosition);
-
-      m_backRightPIDController.enableContinuousInput(0, 360);
-
-      m_backLeftDriveMotor.restoreFactoryDefaults();
-      m_backLeftDriveMotor.setIdleMode(IdleMode.kBrake);
-      m_backLeftDriveMotor.enableVoltageCompensation(12);
-      m_backLeftDriveMotor.setSmartCurrentLimit(10);
+      configMotorController(m_backLeftDriveMotor);
       m_backLeftDriveMotor.setInverted(DriveConstants.kBackLeftDriveInverted);
-
-      m_backLeftSteerMotor.restoreFactoryDefaults();
-      m_backLeftSteerMotor.setIdleMode(IdleMode.kBrake);
-      m_backLeftSteerMotor.enableVoltageCompensation(12);
-      m_backLeftSteerMotor.setSmartCurrentLimit(10);
-
-      m_backLeftCANCoder.configSensorInitializationStrategy(SensorInitializationStrategy.BootToAbsolutePosition);
+      configMotorController(m_backLeftSteerMotor);
 
       m_backLeftPIDController.enableContinuousInput(0, 360);
+
+      configMotorController(m_backRightDriveMotor);
+      m_backRightDriveMotor.setInverted(DriveConstants.kBackRightDriveInverted);
+      configMotorController(m_backRightSteerMotor);
+
+      m_backRightPIDController.enableContinuousInput(0, 360);
     }
   }
 
   public static DriveSubsystem get() {
     return s_subsystem;
+  }
+
+  public static void configMotorController(CANSparkMax motorController) {
+    motorController.restoreFactoryDefaults();
+    motorController.setIdleMode(IdleMode.kBrake);
+    motorController.enableVoltageCompensation(12);
+    motorController.setSmartCurrentLimit(10);
   }
 
   public double getHeading() {
