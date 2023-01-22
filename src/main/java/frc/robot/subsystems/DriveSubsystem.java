@@ -10,6 +10,7 @@ import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
 import edu.wpi.first.math.controller.PIDController;
+import com.revrobotics.RelativeEncoder;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.DriveConstants;
@@ -29,14 +30,18 @@ public class DriveSubsystem extends SubsystemBase {
   private CANCoder m_backRightCANCoder = new CANCoder(DriveConstants.kBackRightCANCoderPort);
 
   private CANSparkMax m_frontLeftDriveMotor = new CANSparkMax(DriveConstants.kFrontLeftDrivePort, MotorType.kBrushless);
+  public RelativeEncoder m_frontLeftDriveEncoder = m_frontLeftDriveMotor.getEncoder();
   private CANSparkMax m_frontLeftSteerMotor = new CANSparkMax(DriveConstants.kFrontLeftSteerPort, MotorType.kBrushless);
   private CANSparkMax m_frontRightDriveMotor = new CANSparkMax(DriveConstants.kFrontRightDrivePort,
       MotorType.kBrushless);
+  public RelativeEncoder m_frontRightDriveEncoder = m_frontRightDriveMotor.getEncoder();
   private CANSparkMax m_frontRightSteerMotor = new CANSparkMax(DriveConstants.kFrontRightSteerPort,
       MotorType.kBrushless);
   private CANSparkMax m_backLeftDriveMotor = new CANSparkMax(DriveConstants.kBackLeftDrivePort, MotorType.kBrushless);
+  public RelativeEncoder m_backLeftDriveEncoder = m_backLeftDriveMotor.getEncoder();
   private CANSparkMax m_backLeftSteerMotor = new CANSparkMax(DriveConstants.kBackLeftSteerPort, MotorType.kBrushless);
   private CANSparkMax m_backRightDriveMotor = new CANSparkMax(DriveConstants.kBackRightDrivePort, MotorType.kBrushless);
+  public RelativeEncoder m_backRightDriveEncoder = m_backRightDriveMotor.getEncoder();
   private CANSparkMax m_backRightSteerMotor = new CANSparkMax(DriveConstants.kBackRightSteerPort, MotorType.kBrushless);
   private static DriveSubsystem s_subsystem;
 

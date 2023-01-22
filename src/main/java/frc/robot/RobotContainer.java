@@ -8,7 +8,9 @@ import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.CalibrationAutoCommand.Operation;
 import frc.robot.Constants.ControllerConstants;
 import frc.robot.Constants.ControllerConstants.Axis;
 import frc.robot.commands.DefaultDriveCommand;
@@ -53,6 +55,7 @@ public class RobotContainer {
   }
 
   public Command getAutonomousCommand() {
-    return new CalibrationAutoCommand();
+    return new SequentialCommandGroup(new CalibrationAutoCommand(Operation.CMD_ANGLE, 0),
+                                      new CalibrationAutoCommand(Operation.CMD_DISTANCE, 8));
   }
 }
