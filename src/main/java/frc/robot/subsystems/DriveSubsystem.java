@@ -45,6 +45,10 @@ public class DriveSubsystem extends SubsystemBase {
   private CANSparkMax m_backRightSteerMotor = new CANSparkMax(DriveConstants.kBackRightSteerPort, MotorType.kBrushless);
   private static DriveSubsystem s_subsystem;
 
+  public CANCoder getFrontLeftCANCoder(){
+    return this.m_frontLeftCANCoder;
+  }
+
   /** Creates a new DriveSubsystem. */
   public DriveSubsystem() {
     // Singleton

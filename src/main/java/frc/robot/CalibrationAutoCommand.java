@@ -16,7 +16,10 @@ public class CalibrationAutoCommand extends CommandBase {
         m_driveSubsystem = DriveSubsystem.get();
         m_op = op;
         if (m_op == Operation.CMD_DISTANCE) {
-            m_amount = amount * 326.6369f;
+            // TODO add conversion constants to Constants.java that include
+            // TODO neo motor ticks per revolution, gear ratio, wheel diameter (to circumference)
+            // TODO Also, CMD_DISTANCE should take meters to be consisten with other robot code.
+            m_amount = amount * 326.6369f; // TODO do full conversion calculation ticks per meter
         } else if (m_op == Operation.CMD_ANGLE) { 
             m_amount = amount;
         } else {
@@ -45,28 +48,23 @@ public class CalibrationAutoCommand extends CommandBase {
             m_driveSubsystem.m_backLeftDriveEncoder.setPosition(0);
             m_driveSubsystem.m_backRightDriveEncoder.setPosition(0);
 
-            // turn on motors - set speed
+            // turn on motors - set 10% power for now
             m_driveSubsystem.setDriveMotors(.1, .1, .1, .1);
         }
-        // m_driveSubsystem.setSteerMotors(m_target, m_target, m_target, m_target);
-
-        // todo: turn on motors
-        // todo: reset distance encoders to zero
     }
 
     @Override
     public boolean isFinished() {
-        if (Math.abs(m_driveSubsystem.m_frontLeftDriveEncoder.getPosition()) >= m_amount) {
-            return true;
-        } 
-        /*
-         * double error = m_driveSubsystem.getFrontLeftSteerEncoderPosition() -
-         * Math.toRadians(90);
-         * if (Math.abs(error) < Math.toRadians(1)){
-         * return true;
-         * }
-         */
-                // check encoders to see if distance reached
+        switch(m_op){
+            case CMD_ANGLE:
+                //The error between the actual angle and the target angle
+                double error = m_driveSubsystem.getFrontLeftCANCoder().getPosition() - Math.toRadians(m_amount);
+                return Math.abs(error) < Math.toRadians((1));
+            case CMD_DISTANCE:
+                //Determine whether the target distance has been reached
+                return (m_driveSubsystem.m_frontLeftDriveEncoder.getPosition() >= m_amount);
+        }
+                
         return false;
     }
 
