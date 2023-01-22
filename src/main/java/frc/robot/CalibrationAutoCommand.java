@@ -6,6 +6,7 @@ import frc.robot.subsystems.DriveSubsystem;
 public class CalibrationAutoCommand extends CommandBase {
     private final DriveSubsystem m_driveSubsystem;
 
+    int m_target = 0;
     public CalibrationAutoCommand() {
         m_driveSubsystem = DriveSubsystem.get();
         addRequirements(DriveSubsystem.get());
@@ -17,7 +18,8 @@ public class CalibrationAutoCommand extends CommandBase {
 
     @Override
     public void execute() {
-        m_driveSubsystem.setSteerMotors(0, 0, 0, 0);
+        m_target += 90;
+        m_driveSubsystem.setSteerMotors(m_target, m_target, m_target, m_target);
     }
 
     @Override
