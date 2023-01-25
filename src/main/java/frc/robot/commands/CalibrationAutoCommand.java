@@ -1,25 +1,35 @@
-package frc.robot;
+package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.DriveSubsystem;
+import frc.robot.Constants;
 
 public class CalibrationAutoCommand extends CommandBase {
     private final DriveSubsystem m_driveSubsystem;
 
-    enum Operation {
+    public static enum Operation {
         CMD_ANGLE, CMD_DISTANCE
     }
 
     Operation m_op;
     double m_amount = 0; // if distance, in ticks; if angle, in degrees
-    public CalibrationAutoCommand(Operation op, double amount) {
+  /***
+   * Autonomous command to steer and drive
+   * 
+   * @param op
+   *                        Enumerated mode-steer (CMD_ANGLE) or drive (CMD_DISTANCE)
+   * @param amount
+   *                        op == CMD_ANGLE: amount is angle in degrees,
+   *                        op == CMD_DISTANCE: amount is distance in meters
+   * @see Operation
+   */
+    public CalibrationAutoCommand(Operation op, double amount) { 
         m_driveSubsystem = DriveSubsystem.get();
         m_op = op;
         if (m_op == Operation.CMD_DISTANCE) {
-            // TODO add conversion constants to Constants.java that include
-            // TODO neo motor ticks per revolution, gear ratio, wheel diameter (to circumference)
-            // TODO Also, CMD_DISTANCE should take meters to be consisten with other robot code.
-            m_amount = amount * 326.6369f; // TODO do full conversion calculation ticks per meter
+            double wheelCirc = Math.PI * Constants.SwerveConstants.wheelDiameter;
+            double metersToTicks = (Constants.SwerveConstants.ticksPerAxisRev * Constants.SwerveConstants.gearRatio * 39.37) / wheelCirc;
+            m_amount = amount * metersToTicks; 
         } else if (m_op == Operation.CMD_ANGLE) { 
             m_amount = amount;
         } else {

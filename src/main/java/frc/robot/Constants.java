@@ -96,4 +96,10 @@ public final class Constants {
 		// testing, because crashing into people's shins would be bad
 		public static final double kSpeedMultiplier = 0.25;
 	}
+
+	public static final class SwerveConstants {
+		public static final double gearRatio = 8.14;
+		public static final double wheelDiameter = 4; // in inches
+		public static final double ticksPerAxisRev = 42;
+	}
 }
