@@ -8,12 +8,13 @@ import com.ctre.phoenix.sensors.CANCoder;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
+import com.revrobotics.RelativeEncoder;
 
 import edu.wpi.first.math.controller.PIDController;
-import com.revrobotics.RelativeEncoder;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.DriveConstants;
+import frc.robot.Constants.SwerveConstants;
 
 public class DriveSubsystem extends SubsystemBase {
   private PIDController m_frontLeftPIDController = new PIDController(DriveConstants.kP, DriveConstants.kI,
@@ -84,6 +85,11 @@ public class DriveSubsystem extends SubsystemBase {
       configMotorController(m_backRightDriveMotor);
       m_backRightDriveMotor.setInverted(DriveConstants.kBackRightDriveInverted);
       configMotorController(m_backRightSteerMotor);
+
+      m_frontLeftCANCoder.configMagnetOffset(-SwerveConstants.frontLeftZero);
+      m_frontRightCANCoder.configMagnetOffset(-SwerveConstants.frontRightZero);
+      m_backLeftCANCoder.configMagnetOffset(-SwerveConstants.backLeftZero);
+      m_backRightCANCoder.configMagnetOffset(-SwerveConstants.backRightZero);
 
       m_backRightPIDController.enableContinuousInput(0, 360);
     }
